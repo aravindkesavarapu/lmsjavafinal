@@ -1,0 +1,67 @@
+@Override
+	public boolean request(int bookId, int id) {
+		EntityTransaction transaction = null;
+		manager = factory.createEntityManager();
+		List<BooksBorrowed> rsBookBorrowed = null;
+		try {
+			transaction = manager.getTransaction();
+			String jpqlBookDetails = "select b from BookDetails b where b.bookId=:bookId";
+			TypedQuery<BookDetails> query = manager.createQuery(jpqlBookDetails, BookDetails.class);
+			query.setParameter("bookId", bookId);
+			List<BookDetails> resultSetBookDetails = query.getResultList();
+			if (resultSetBookDetails != null) {
+				String jpqlRequest = "select r from RequestDetails r where r.uId=:uId and r.bookId=:bookId";
+				TypedQuery<RequestDetails> queryRequest = (TypedQuery<RequestDetails>) manager.createQuery(jpqlRequest,
+						RequestDetails.class);
+				queryRequest.setParameter("uId", id);
+				queryRequest.setParameter("bookId", bookId);
+				List<RequestDetails> listReq = queryRequest.getResultList();
+				if (listReq.size() < 1) {
+
+					String jpqlBookBorrwed = "select b from BooksBorrowed b where b.uId=:uId and b.bookId=:bookId";
+					TypedQuery<BooksBorrowed> queryBookBorrowed = (TypedQuery<BooksBorrowed>) manager
+							.createQuery(jpqlBookBorrwed, BooksBorrowed.class);
+					queryBookBorrowed.setParameter("uId", id);
+					queryBookBorrowed.setParameter("bookId", bookId);
+					rsBookBorrowed = queryBookBorrowed.getResultList();
+					if (rsBookBorrowed.isEmpty() || rsBookBorrowed == null) {
+						String jpqlBookIssue = "select b from BookIssue b where b.uId=:uId";
+						TypedQuery<BookIssue> query2 = (TypedQuery<BookIssue>) manager.createQuery(jpqlBookIssue,
+								BookIssue.class);
+						query2.setParameter("uId", id);
+						List<BookIssue> rsBookIssue = query2.getResultList();
+						noOfBooks = rsBookIssue.size();
+						if (noOfBooks <= 3) {
+							BookDetails book = manager.find(BookDetails.class, bookId);
+							User userEmail = manager.find(User.class, id);
+							transaction.begin();
+							RequestDetails rsRequestDetails = new RequestDetails();
+							rsRequestDetails.setBookId(bookId);
+							rsRequestDetails.setEmail(userEmail.getEmail());
+							rsRequestDetails.setBookName(book.getBookName());
+							rsRequestDetails.setUId(id);
+							manager.persist(rsRequestDetails);
+							transaction.commit();
+							return true;
+						} else {
+							throw new LMSException("You have crossed the book limit");
+						}
+					} else {
+						throw new LMSException("You have already borrowed the requested book");
+					}
+				} else {
+					throw new LMSException("You Are Requesting the Same bok");
+				}
+			} else {
+				throw new LMSException("The book with requested id is not present");
+			}
+
+		} catch (Exception e) {
+			System.err.println(e.getMessage());
+			transaction.rollback();
+			return false;
+		} finally {
+			manager.close();
+		}
+
+	}
