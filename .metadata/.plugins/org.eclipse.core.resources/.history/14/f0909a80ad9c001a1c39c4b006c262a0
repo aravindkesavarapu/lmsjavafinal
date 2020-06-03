@@ -1,8 +1,0 @@
-package com.capgemini.lmsspringrest.testrunner;
-
-import cucumber.api.CucumberOptions;
-
-
-public class TestRunner {
-
-}

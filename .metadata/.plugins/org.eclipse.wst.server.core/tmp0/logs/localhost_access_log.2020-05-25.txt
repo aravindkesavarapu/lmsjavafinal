@@ -294,3 +294,7 @@
 0:0:0:0:0:0:0:1 - - [25/May/2020:09:03:23 +0530] "POST /lmsspringrest/login HTTP/1.1" 200 208
 0:0:0:0:0:0:0:1 - - [25/May/2020:09:03:34 +0530] "GET /lmsspringrest/showIssuedBooks HTTP/1.1" 200 120
 0:0:0:0:0:0:0:1 - - [25/May/2020:09:03:36 +0530] "GET /lmsspringrest/showRequests HTTP/1.1" 200 561
+127.0.0.1 - - [25/May/2020:18:43:47 +0530] "GET / HTTP/1.1" 404 709
+0:0:0:0:0:0:0:1 - - [25/May/2020:18:44:15 +0530] "OPTIONS /lmsspringrest/login HTTP/1.1" 200 -
+0:0:0:0:0:0:0:1 - - [25/May/2020:18:44:17 +0530] "POST /lmsspringrest/login HTTP/1.1" 200 208
+0:0:0:0:0:0:0:1 - - [25/May/2020:18:44:49 +0530] "POST /lmsspringrest/login HTTP/1.1" 200 208

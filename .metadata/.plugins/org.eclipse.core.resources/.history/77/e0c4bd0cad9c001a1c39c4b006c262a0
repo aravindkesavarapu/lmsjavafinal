@@ -1,8 +1,0 @@
-package com.capgemini.lmsspringrest.testrunner;
-
-import org.junit.runner.RunWith;
-
-
-public class TestRunner {
-
-}

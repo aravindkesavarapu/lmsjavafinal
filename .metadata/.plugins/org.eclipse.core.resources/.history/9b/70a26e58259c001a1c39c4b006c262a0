@@ -1,6 +1,0 @@
-Feature: User Registration
-
-  Scenario: User Registration Test Scenario
-    Given User is On Registration Page
-    When User enters "aravind","kesavarapu","aravind123@gmail.com","aravind",987654321,"ADMIN"
-    Then User LoggedIn
