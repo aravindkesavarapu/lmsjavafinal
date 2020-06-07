@@ -5,29 +5,35 @@ import static org.junit.Assert.assertTrue;
 import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.capgemini.lmscucumber.testrunner.AdminTestRunner;
 
-import cucumber.api.java.Before;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 
 public class AdminSteps extends AdminTestRunner {
+	public static WebDriver driver;
+	public static WebDriverWait wait;
+	public static Actions action;
 
-	@Before
-	public void openBrowser() throws Exception {
-		driver = new ChromeDriver();
-		driver.get("http://localhost:4200/login");
-		driver.manage().window().maximize();
-		driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+	static {
+		System.setProperty("webdriver.chrome.driver",
+				"C://Users//Aravind//Desktop//Final Parallel Project LMS//lmscucmber//driver//chromedriver.exe");
 	}
 
 	@Given("^Admin is on Login page$")
 	public void admin_is_on_Login_page() throws Throwable {
+		driver = new ChromeDriver();
 		Thread.sleep(5000);
+		driver.get("http://localhost:4200/login");
+		driver.manage().window().maximize();
+		driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
 		String actual = driver.getTitle();
 		String excepted = "Library";
 		assertTrue("The webpage is not a login page", actual.equals(excepted));
@@ -211,7 +217,7 @@ public class AdminSteps extends AdminTestRunner {
 	@Then("^show book based on book name$")
 	public void show_book_based_on_name() throws Throwable {
 		String actualBookName = driver.findElement(By.xpath("//tr[1]//td[3]")).getText().trim();
-		String expectedBookName = "Signals and Systems";
+		String expectedBookName = "Half Girl";
 		System.out.println(actualBookName);
 		assertTrue("Student Searched A Book By Book Name", actualBookName.equalsIgnoreCase(expectedBookName));
 		driver.close();
@@ -235,7 +241,7 @@ public class AdminSteps extends AdminTestRunner {
 	@Then("^Show books based on book author name$")
 	public void show_books_based_on_author_name() throws Throwable {
 		String actualBookAuthorName = driver.findElement(By.xpath("//tr[1]//td[4]")).getText().trim();
-		String expectedBookAuthorName = "Ramanujan";
+		String expectedBookAuthorName = "James";
 		System.out.println(actualBookAuthorName);
 		assertTrue("Student Searched A Book By Author Name",
 				actualBookAuthorName.equalsIgnoreCase(expectedBookAuthorName));

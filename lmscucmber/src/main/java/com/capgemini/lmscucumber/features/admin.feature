@@ -3,7 +3,7 @@ Feature: Admin can add,delete,update,issue books and able to view books
 
   Background: 
     Given Admin is on Login page
-    When Admin enters "aravind@gmail.com","aravind"
+    When Admin enters "aravind@gmail.com","Ara@12"
     And Admin click on login button
     Then Admin should be logged in
 
@@ -13,8 +13,8 @@ Feature: Admin can add,delete,update,issue books and able to view books
     Then Book Added status
 
     Examples: 
-      | bookName      | authorName  | publisherName  | copies | bookCategory |
-      | "Signals and Systems" | "Ramanujan" | "MrPublishers" |     12 | "computing"  |
+      | bookName              | authorName   | publisherName | copies | bookCategory |
+      | "Signals and Systems" | "NagoorKani" | "Arihant"     |     12 | "EEE"        |
 
   Scenario: Admin should able to View Requested Books and Issue the Books
     Given Admin  navigates to Requested books page
@@ -29,28 +29,20 @@ Feature: Admin can add,delete,update,issue books and able to view books
     Given Admin is on Search Books Page
     When Admin click on Update button
     Then Admin navigates to Update Book Page
-    And Admin  wants to Update "aaaa",5
+    And Admin  wants to Update "Core Java",11
     Then Admin click on Update Book Button
 
-   Scenario: Admin can Delete Book From Library
-   Given Admin is on Search Book Page
-   When Admin click on Delete button
-   Then Book Deleted successfully
-    
-    Scenario: Admin should be able to view book based on names
+  Scenario: Admin can Delete Book From Library
+    Given Admin is on Search Book Page
+    When Admin click on Delete button
+    Then Book Deleted successfully
+
+  Scenario: Admin should be able to view book based on names
     Given Admin is on viewing book page based on names
-    When Admin enters book Name as "Signals and Systems"
+    When Admin enters book Name as "Half Girl"
     Then show book based on book name
 
   Scenario: Admin should be able to view book based on author name
     Given Admin is on viewing book page based on author Name
-    When Admin enters book author Name as "Ramanujan"
+    When Admin enters book author Name as "James"
     Then Show books based on book author name
-
-  #Scenario: Admin able to login and logout
-    #Given Admin is on home page
-    #When Admin click on logout
-    #Then Admin loggedout
-    
-    
-    

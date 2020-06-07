@@ -3,7 +3,7 @@ Feature: Student can request,return and able to view books
 
   Background: 
     Given Student is on Login page
-    When Student enters "aravindk@gmail.com","aravind"
+    When Student enters "shivak@gmail.com","Ara@12"
     Then Student should be logged in
 
   Scenario: Student should be able to request books
@@ -25,8 +25,3 @@ Feature: Student can request,return and able to view books
     Given Student is on  viewing books page based on author Name
     When Student enters author name "James"
     Then show books based on  author name
-
-  #Scenario: Student able to login and logout
-    #Given Student is on home page
-    #When Student click on logout
-    #Then Student loggedout

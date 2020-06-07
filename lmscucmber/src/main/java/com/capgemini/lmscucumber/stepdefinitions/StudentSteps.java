@@ -5,28 +5,31 @@ import static org.junit.Assert.assertTrue;
 import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import com.capgemini.lmscucumber.testrunner.StundentTestRunner;
-
-import cucumber.api.java.Before;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 
-public class StudentSteps extends StundentTestRunner {
+public class StudentSteps {
 
-	@Before
-	public void openBrowser() throws Exception {
-		driver = new ChromeDriver();
-		driver.get("http://localhost:4200/login");
-		driver.manage().window().maximize();
-		driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+	public static WebDriver driver;
+	public static WebDriverWait wait;
+
+	static {
+		System.setProperty("webdriver.chrome.driver",
+				"C://Users//Aravind//Desktop//Final Parallel Project LMS//lmscucmber//driver//chromedriver.exe");
+
 	}
 
 	@Given("^Student is on Login page$")
 	public void student_is_on_Login_page() throws Throwable {
+		driver = new ChromeDriver();
+		driver.manage().window().maximize();
+		driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+		driver.get("http://localhost:4200/login");
 		Thread.sleep(5000);
 		String actual = driver.getTitle();
 		String excepted = "Library";
@@ -80,7 +83,7 @@ public class StudentSteps extends StundentTestRunner {
 		String expectedMessage = "Request placed successfully";
 		driver.switchTo().alert().accept();
 		assertTrue("Book Requested Sucessfully", autualMessage.equalsIgnoreCase(expectedMessage));
-//		driver.close();
+		driver.close();
 	}
 
 	@Given("^Student is on returning book page$")
@@ -96,7 +99,6 @@ public class StudentSteps extends StundentTestRunner {
 		String titleName = driver.findElement(By.tagName("h6")).getText();
 		assertTrue("Student is On Borrowrd Book", titleName.equals("Borrowed Books"));
 		driver.findElement(By.xpath("//tr[1]//td[6]//button[1]")).click();
-
 	}
 
 	@Then("^Book Returned Successfully$")
@@ -105,7 +107,7 @@ public class StudentSteps extends StundentTestRunner {
 		String actualMessage = driver.findElement(By.xpath("//body/app-root/app-return-books/div/div[1]")).getText();
 		String exceptedMessage = "Book returned to the Library";
 		assertTrue("Book Reurned Sucessfully", actualMessage.equals(exceptedMessage));
-//		driver.close();
+		driver.close();
 	}
 
 	@Given("^Student is on  viewing books page based on names$")
@@ -127,7 +129,7 @@ public class StudentSteps extends StundentTestRunner {
 		System.out.println(actualBookName);
 		String expectedBookName = "Signals and Systems";
 		assertTrue("Student Searched A Book By Book Name", actualBookName.equalsIgnoreCase(expectedBookName));
-//		driver.close();
+		driver.close();
 	}
 
 	@Given("^Student is on  viewing books page based on author Name$")
@@ -150,37 +152,7 @@ public class StudentSteps extends StundentTestRunner {
 		String actualBookName = driver.findElement(By.xpath("//tr[1]//td[4]")).getText().trim();
 		String expectedBookName = "James";
 		assertTrue("Student Searched A Book By Author Name", actualBookName.equals(expectedBookName));
-//		driver.close();
-
+		driver.close();
 	}
-
-//	@Given("^Student is on home page$")
-//	public void student_is_on_home_page() throws Throwable {
-//		Thread.sleep(2000);
-//		String actualTitle = driver.getCurrentUrl().trim();
-//		System.out.println(actualTitle);
-//		String exceptedUrl = "http://localhost:4200/home";
-//		assertTrue("Student Is On Home Page", actualTitle.equals(exceptedUrl));
-//	}
-//
-//	@When("^Student click on logout$")
-//	public void student_click_on_logout() throws Throwable {
-//		driver.findElement(By.name("logoutbutton")).click();
-//	}
-//
-//	@Then("^Student loggedout$")
-//	public void student_loggedout() throws Throwable {
-//		driver.close();
-//	}
-//	@After
-//	public void logout() throws Throwable{
-//		driver.findElement(By.name("logoutbutton")).click();
-//		Thread.sleep(2000);
-//		String titleName = driver.findElement(By.tagName("h2")).getText();
-//		String expectedName = "Welcome To Library Management System";
-//		assertTrue(titleName.equals(expectedName));
-////	
-//		driver.close();	
-//	}
 
 }

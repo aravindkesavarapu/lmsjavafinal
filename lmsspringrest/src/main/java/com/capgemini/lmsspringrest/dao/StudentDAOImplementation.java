@@ -27,10 +27,11 @@ public class StudentDAOImplementation implements StudentDAO {
 	@PersistenceUnit
 	EntityManagerFactory factory;
 
-	EntityManager manager = null;
 
 	@Override
 	public boolean returnBook(int bId, int uId) {
+		EntityManager manager = null;
+
 		EntityTransaction transaction = null;
 		try {
 			manager = factory.createEntityManager();
@@ -101,6 +102,7 @@ public class StudentDAOImplementation implements StudentDAO {
 	@Override
 	public boolean request(int bookId, int id) {
 		EntityTransaction transaction = null;
+		EntityManager manager = null;
 		int noOfBooks = 0;
 		List<BooksBorrowed> rsBookBorrowed = null;
 		try {
@@ -172,7 +174,7 @@ public class StudentDAOImplementation implements StudentDAO {
 			throw new LMSException("Book Not Requested!! Please Try Again");
 		} catch (NullPointerException e) {
 			transaction.rollback();
-			throw new LMSException("Book Not Requested!! Please Try Again");
+			throw new LMSException("ssssBook Not Requested!! Please Try Again");
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
 			transaction.rollback();
@@ -182,9 +184,83 @@ public class StudentDAOImplementation implements StudentDAO {
 		}
 
 	}
-
+//	@Override
+//	public boolean request(int bookId, int id) {
+//		EntityTransaction transaction = null;
+//		EntityManager manager = null;
+//		List<BooksBorrowed> rsBookBorrowed = null;
+//		int noOfBooks =0 ;
+//		try {
+//			manager = factory.createEntityManager();
+//			transaction = manager.getTransaction();
+//			String jpqlBookDetails = "select b from BookDetails b where b.bookId=:bookId";
+//			TypedQuery<BookDetails> query = manager.createQuery(jpqlBookDetails, BookDetails.class);
+//			query.setParameter("bookId", bookId);
+//			List<BookDetails> resultSetBookDetails = query.getResultList();
+//			if (resultSetBookDetails != null) {
+//				String jpqlRequest = "select r from RequestDetails r where r.uId=:uId and r.bookId=:bookId";
+//				TypedQuery<RequestDetails> queryRequest = (TypedQuery<RequestDetails>) manager.createQuery(jpqlRequest,
+//						RequestDetails.class);
+//				queryRequest.setParameter("uId", id);
+//				queryRequest.setParameter("bookId", bookId);
+//				List<RequestDetails> listReq = queryRequest.getResultList();
+//				if (listReq.size() < 1) {
+//					String jpqlBookBorrwed = "select b from BooksBorrowed b where b.uId=:uId and b.bookId=:bookId";
+//					TypedQuery<BooksBorrowed> queryBookBorrowed = (TypedQuery<BooksBorrowed>) manager
+//							.createQuery(jpqlBookBorrwed, BooksBorrowed.class);
+//					queryBookBorrowed.setParameter("uId", id);
+//					queryBookBorrowed.setParameter("bookId", bookId);
+//					rsBookBorrowed = queryBookBorrowed.getResultList();
+//					if (rsBookBorrowed.isEmpty() || rsBookBorrowed == null) {
+//						String jpqlBookIssue = "select b from BookIssue b where b.uId=:uId";
+//						TypedQuery<BookIssue> query2 = (TypedQuery<BookIssue>) manager.createQuery(jpqlBookIssue,
+//								BookIssue.class);
+//						query2.setParameter("uId", id);
+//						List<BookIssue> rsBookIssue = query2.getResultList();
+//						noOfBooks = rsBookIssue.size();
+//						if (noOfBooks <= 3) {
+//							BookDetails book = manager.find(BookDetails.class, bookId);
+//							System.out.println("jhvhbhkjnhbgv");
+//							User userEmail = manager.find(User.class, id);
+//							System.err.println("09876543");
+//							transaction.begin();
+//							RequestDetails rsRequestDetails = new RequestDetails();
+//							System.out.println(" jknj");
+//							rsRequestDetails.setBookId(bookId);
+//							System.out.println("0987");
+//							rsRequestDetails.setEmail(userEmail.getEmail());
+//							System.out.println("000");
+//							rsRequestDetails.setBookName(book.getBookName());
+//							System.out.println("oiuy");
+//							rsRequestDetails.setUId(id);
+//							System.out.println("567");
+//							manager.persist(rsRequestDetails);
+//							transaction.commit();
+//							return true;
+//						} else {
+//							throw new LMSException("You have crossed the book limit");
+//						}
+//					} else {
+//						throw new LMSException("You have already borrowed the requested book");
+//					}
+//				} else {
+//					throw new LMSException("You Are Requesting the Same book");
+//				}
+//			} else {
+//				throw new LMSException("The book with requested id is not present");
+//			}
+//		} catch (Exception e) {
+//			System.err.println(e.getMessage());
+//			transaction.rollback();
+//			return false;
+//		} finally {
+//			manager.close();
+//		}
+//	}
+//	
 	@Override
 	public List<BooksBorrowed> getBorrowedBooks(int uid) {
+		EntityManager manager = null;
 
 		try {
 			manager = factory.createEntityManager();
