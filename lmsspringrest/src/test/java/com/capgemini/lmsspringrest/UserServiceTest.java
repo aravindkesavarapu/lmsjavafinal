@@ -25,7 +25,7 @@ public class UserServiceTest {
 		user.setPassword("qwerty");
 		user.setMobileNo(987654321);
 		user.setRole("student");
-		boolean result = service.registerUser(user);
+		boolean result = service.addUser(user);
 		Assertions.assertTrue(result);
 	}
 	
@@ -40,19 +40,19 @@ public class UserServiceTest {
 		user.setPassword("qwerty");
 		user.setMobileNo(987654321);
 		user.setRole("student");
-		boolean result = service.registerUser(user);
+		boolean result = service.addUser(user);
 		Assertions.assertFalse(result);
 	}
 	
 	@Test
 	public void  testLoginUser() {
-		User result = service.authUser("dhana@gmail.com", "Dhana23@");
+		User result = service.authUser("aravind@gmail.com", "Aravind23@");
 		Assertions.assertNotNull(result);
 	}
 	
 	@Test
 	public void  testLoginUsers() {
-		User result = service.authUser("dhana@gmail.com", "Dhana23@");
+		User result = service.authUser("aravind@gmail.com", "Aravind23@");
 		Assertions.assertNotNull(result);
 	}
 	
@@ -106,13 +106,13 @@ public class UserServiceTest {
 	
 	@Test
 	public void testUpdatePassword() {
-		boolean result = service.updatePassword(12345, "Dan23@", "Van23@", "new");
+		boolean result = service.updatePassword(12345, "aravind23@", "Ara23@", "new");
 		Assertions.assertTrue(result);
 	}
 	
 	@Test
 	public void testUpdatePasswords() {
-		boolean result = service.updatePassword(12345, "Dan23@", "Van23@", "new");
+		boolean result = service.updatePassword(12345, "aravind23@", "Ara23@", "new");
 		Assertions.assertTrue(result);
 	}
 }

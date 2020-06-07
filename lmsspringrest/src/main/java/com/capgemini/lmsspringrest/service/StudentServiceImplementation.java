@@ -1,6 +1,5 @@
 package com.capgemini.lmsspringrest.service;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,13 +25,8 @@ public class StudentServiceImplementation implements StudentService {
 	}
 
 	@Override
-	public LinkedList<Integer> bookHistoryDetails(int id) {
-		return dao.bookHistoryDetails(id);
-	}
-
-	@Override
-	public List<BooksBorrowed> borrowedBook(int id) {
-		return dao.borrowedBook(id);
+	public List<BooksBorrowed> getBorrowedBooks(int uId) {
+		return dao.getBorrowedBooks(uId);
 	}
 
 }

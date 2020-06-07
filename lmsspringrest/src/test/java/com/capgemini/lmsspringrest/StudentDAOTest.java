@@ -26,7 +26,7 @@ public class StudentDAOTest {
 	}
 	@Test
 	public void testBorrowedBook() {
-		List<BooksBorrowed> info = dao.borrowedBook(54321);
+		List<BooksBorrowed> info = dao.getBorrowedBooks(54321);
 		Assertions.assertNotNull(info);
 	}
 	@Test
@@ -41,7 +41,7 @@ public class StudentDAOTest {
 	}
 	@Test
 	public void testBorrowedBook1() {
-		List<BooksBorrowed> result = dao.borrowedBook(54321);
+		List<BooksBorrowed> result = dao.getBorrowedBooks(54321);
 		Assertions.assertNotNull(result);
 	}
 	

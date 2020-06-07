@@ -7,6 +7,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceUnit;
 import javax.persistence.TypedQuery;
 
@@ -36,10 +37,18 @@ public class AdminDAOImplementation implements AdminDAO {
 			manager.persist(bookInfo);
 			transaction.commit();
 			return true;
-		} catch (Exception e) {
-			System.err.println(e.getMessage());
+		} catch (LMSException e) {
 			transaction.rollback();
-			return false;
+			throw new LMSException("Book Not Added to database");
+		} catch (NoResultException e) {
+			transaction.rollback();
+			throw new LMSException("Book Not Added to database!! Please Try Again");
+		} catch (NullPointerException e) {
+			transaction.rollback();
+			throw new LMSException("Book Not Added to DataBase!! Please Try Again ");
+		} catch (Exception e) {
+			transaction.rollback();
+			throw new LMSException("Error Occured While Commiting the Transction");
 		} finally {
 			manager.close();
 		}
@@ -61,10 +70,18 @@ public class AdminDAOImplementation implements AdminDAO {
 			} else {
 				throw new LMSException("No Book Found");
 			}
-		} catch (Exception e) {
-			System.err.println(e.getMessage());
+		} catch (LMSException e) {
 			transaction.rollback();
-			return false;
+			throw new LMSException(e.getMessage());
+		} catch (NoResultException e) {
+			transaction.rollback();
+			throw new LMSException("No Book Found with this BookId!! Please Try Again");
+		} catch (NullPointerException e) {
+			transaction.rollback();
+			throw new LMSException("No Book Found with this BookId!! Please Try Again ");
+		} catch (Exception e) {
+			transaction.rollback();
+			throw new LMSException("Error Occured While Commiting the Transction");
 		} finally {
 			manager.close();
 		}
@@ -80,12 +97,24 @@ public class AdminDAOImplementation implements AdminDAO {
 			transaction.begin();
 			BookDetails record = manager.find(BookDetails.class, bookInfo.getBookId());
 			record.setBookName(bookInfo.getBookName());
+			record.setBookCategory(bookInfo.getBookCategory());
+			record.setCopies(bookInfo.getCopies());
+			record.setPublisherName(bookInfo.getPublisherName());
+			record.setAuthorName(bookInfo.getAuthorName());
 			transaction.commit();
 			return true;
-		} catch (Exception e) {
-			System.err.println(e.getMessage());
+		} catch (LMSException e) {
 			transaction.rollback();
-			return false;
+			throw new LMSException(e.getMessage());
+		} catch (NoResultException e) {
+			transaction.rollback();
+			throw new LMSException("No Book Found with this bookId !! Please Try Again");
+		} catch (NullPointerException e) {
+			transaction.rollback();
+			throw new LMSException("No Book Found with this BookId!! Please Try Again ");
+		} catch (Exception e) {
+			transaction.rollback();
+			throw new LMSException("Error Occured While Commiting the Transction");
 		} finally {
 			manager.close();
 		}
@@ -95,6 +124,7 @@ public class AdminDAOImplementation implements AdminDAO {
 	public boolean bookIssue(int uId, int bookId) {
 		EntityManager manager = null;
 		EntityTransaction transaction = null;
+		boolean status = false;
 		try {
 			manager = factory.createEntityManager();
 			transaction = manager.getTransaction();
@@ -102,14 +132,17 @@ public class AdminDAOImplementation implements AdminDAO {
 			TypedQuery<BookDetails> bookDetailsQuery = manager.createQuery(jpqlIssue, BookDetails.class);
 			bookDetailsQuery.setParameter("bookId", bookId);
 			List<BookDetails> bookDetailsList = bookDetailsQuery.getResultList();
+			User userInfo = manager.find(User.class, uId);
+			BookDetails bookInfo = manager.find(BookDetails.class, bookId);
+			int noOfBooks = bookInfo.getCopies();
 			if (bookDetailsList != null) {
 				String jpqlReq = "select r from RequestDetails r where r.uId=:uId and r.bookId=:bookId";
 				TypedQuery<RequestDetails> query1 = manager.createQuery(jpqlReq, RequestDetails.class);
 				query1.setParameter("uId", uId);
 				query1.setParameter("bookId", bookId);
-				List<RequestDetails> rs1 = query1.getResultList();
-				System.out.println(rs1.size());
-				if (rs1.size() != 0) {
+				RequestDetails requestInfo = query1.getSingleResult();
+
+				if (requestInfo != null) {
 					transaction.begin();
 					SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 					Calendar cal = Calendar.getInstance();
@@ -119,26 +152,31 @@ public class AdminDAOImplementation implements AdminDAO {
 					System.out.println(returnDate);
 					BookIssue issueBook = new BookIssue();
 					issueBook.setUId(uId);
+					issueBook.setUserMailId(userInfo.getEmail());
 					issueBook.setBookId(bookId);
+					issueBook.setBookName(bookInfo.getBookName());
 					issueBook.setIssueDate(java.sql.Date.valueOf(issueDate));
 					issueBook.setReturnDate(java.sql.Date.valueOf(returnDate));
+					noOfBooks--;
 					manager.persist(issueBook);
 					transaction.commit();
+					transaction.begin();
+					bookInfo.setCopies(noOfBooks);
+					transaction.commit();
 
-					if (!rs1.isEmpty() && rs1 != null) {
-						transaction.begin();
-						BookDetails book = manager.find(BookDetails.class, bookId);
-						BooksBorrowed borrowedBooks = new BooksBorrowed();
-						borrowedBooks.setBookId(bookId);
-						borrowedBooks.setBookName(book.getBookName());
-						borrowedBooks.setUId(uId);
-						manager.persist(borrowedBooks);
-						transaction.commit();
-						return true;
-					} else {
-						throw new LMSException("Book Not issued");
-					}
+					transaction.begin();
+					manager.remove(requestInfo);
+					transaction.commit();
 
+					transaction.begin();
+					BookDetails book = manager.find(BookDetails.class, bookId);
+					BooksBorrowed borrowedBooks = new BooksBorrowed();
+					borrowedBooks.setBookId(bookId);
+					borrowedBooks.setBookName(book.getBookName());
+					borrowedBooks.setUId(uId);
+					manager.persist(borrowedBooks);
+					transaction.commit();
+					status = true;
 				} else {
 					throw new LMSException("The respective user have not placed any request");
 				}
@@ -146,11 +184,24 @@ public class AdminDAOImplementation implements AdminDAO {
 			} else {
 				throw new LMSException("There is no book exist with bookId" + bookId);
 			}
-
-		} catch (Exception e) {
-			System.err.println(e.getMessage());
+			if (status) {
+				return true;
+			} else {
+				transaction.rollback();
+				return false;
+			}
+		} catch (LMSException e) {
 			transaction.rollback();
-			return false;
+			throw new LMSException(e.getMessage());
+		}catch (NoResultException e) {
+			transaction.rollback();
+			throw new LMSException("No Book Found with this BookId!! Please Try Again");
+		} catch (NullPointerException e) {
+			transaction.rollback();
+			throw new LMSException("No Book Found with this BookId!! Please Try Again ");
+		} catch (Exception e) {
+			transaction.rollback();
+			throw new LMSException("Error Occured While Commiting the Transction");
 		} finally {
 			manager.close();
 		}
@@ -158,7 +209,7 @@ public class AdminDAOImplementation implements AdminDAO {
 	}
 
 	@Override
-	public List<RequestDetails> showRequests() {
+	public List<RequestDetails> getAllRequestBooks() {
 
 		EntityManager manager = null;
 		List<RequestDetails> recordList = null;
@@ -168,27 +219,35 @@ public class AdminDAOImplementation implements AdminDAO {
 			TypedQuery<RequestDetails> query = manager.createQuery(jpql, RequestDetails.class);
 			recordList = query.getResultList();
 
+		} catch (LMSException e) {
+			throw new LMSException("Books are not Requested by any of the user");
+		} catch (NoResultException e) {
+			throw new LMSException("Books are not Requested by any of the user user");
+		} catch (NullPointerException e) {
+			throw new LMSException("Books are not Requested by any user!! Please Try Again ");
 		} catch (Exception e) {
-
-			throw new LMSException("Books Are not Requested");
-
+			throw new LMSException("Error Occured While Commiting the Transction");
 		}
 		return recordList;
 	}
 
 	@Override
-	public List<BookIssue> showIssuedBooks() {
+	public List<BookIssue> getAllIssuedBooks() {
 		EntityManager manager = null;
 		List<BookIssue> recordList = null;
-
 		try {
 			manager = factory.createEntityManager();
 			String jpql = "select b from BookIssue b";
 			TypedQuery<BookIssue> query = manager.createQuery(jpql, BookIssue.class);
 			recordList = query.getResultList();
 
+		} 
+		catch (NoResultException e) {
+			throw new LMSException("Books are not Issued");
+		} catch (NullPointerException e) {
+			throw new LMSException("Books are not Issued!! Please Try Again ");
 		} catch (Exception e) {
-			System.err.println("No Books are Issued");
+			throw new LMSException("Error Occured While Commiting the Transction");
 		} finally {
 			manager.close();
 		}
@@ -197,7 +256,7 @@ public class AdminDAOImplementation implements AdminDAO {
 	}
 
 	@Override
-	public List<User> showUsers() {
+	public List<User> getAllUsersInfo() {
 		EntityManager manager = null;
 		List<User> recordList = null;
 		try {
@@ -206,8 +265,12 @@ public class AdminDAOImplementation implements AdminDAO {
 			TypedQuery<User> query = manager.createQuery(jpql, User.class);
 			recordList = query.getResultList();
 
+		}catch (NoResultException e) {
+			throw new LMSException("Till now, no Users Are Registerd");
+		} catch (NullPointerException e) {
+			throw new LMSException("Till now, no Users Are Registerd!! Please Try Again ");
 		} catch (Exception e) {
-			System.err.println("No Users Found");
+			throw new LMSException("Error Occured While Commiting the Transction");
 		} finally {
 			manager.close();
 		}

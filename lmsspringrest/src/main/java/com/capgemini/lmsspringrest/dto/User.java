@@ -19,12 +19,13 @@ import lombok.Data;
 @Entity
 @Table(name = "user")
 @JsonRootName("User_Data")
-@SequenceGenerator(name = "seq4", initialValue = 10001, allocationSize = 100)
+@SequenceGenerator(name = "user_seq", initialValue = 100001, allocationSize = 100)
 public class User implements Serializable {
 
 	@Id
 	@Column
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq4")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq")
+//	@GeneratedValue
 	private int id;
 	@Column
 	private String firstName;

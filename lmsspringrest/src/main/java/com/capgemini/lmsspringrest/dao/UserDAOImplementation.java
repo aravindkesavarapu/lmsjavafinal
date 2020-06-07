@@ -5,7 +5,8 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
-import javax.persistence.PersistenceUnit;
+import javax.persistence.NoResultException;
+import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
 
 import org.springframework.stereotype.Repository;
@@ -17,8 +18,7 @@ import com.capgemini.lmsspringrest.exception.LMSException;
 @Repository
 public class UserDAOImplementation implements UserDAO {
 
-	@PersistenceUnit
-	EntityManagerFactory factory;
+	EntityManagerFactory factory = Persistence.createEntityManagerFactory("TestPersistence");
 
 	@Override
 	public boolean registerUser(User user) {
@@ -26,9 +26,7 @@ public class UserDAOImplementation implements UserDAO {
 		EntityTransaction transaction = null;
 		boolean isRegistered = false;
 		boolean flag = false;
-
 		try {
-
 			manager = factory.createEntityManager();
 			transaction = manager.getTransaction();
 			transaction.begin();
@@ -38,16 +36,26 @@ public class UserDAOImplementation implements UserDAO {
 			isRegistered = true;
 			return isRegistered;
 
+		} catch (LMSException e) {
+			if (flag) {
+				transaction.rollback();
+			}
+			throw new LMSException("No Book Found");
+		} catch (NoResultException e) {
+			if (flag) {
+				transaction.rollback();
+			}
+			throw new LMSException("User Already Exists");
 		} catch (Exception e) {
+
 			System.err.println(e.getMessage());
 			if (flag) {
 				transaction.rollback();
 			}
+			throw new LMSException("Error Occured While Commiting the Transction");
 		} finally {
-			// manager.close();
+			manager.close();
 		}
-
-		return isRegistered;
 	}
 
 	@Override
@@ -55,10 +63,8 @@ public class UserDAOImplementation implements UserDAO {
 		EntityManager manager = null;
 		EntityTransaction transaction = null;
 		try {
-
 			manager = factory.createEntityManager();
 			transaction = manager.getTransaction();
-
 			String jpql = "select u from User u where u.email=:email and u.password=:password";
 			transaction.begin();
 			TypedQuery<User> query = manager.createQuery(jpql, User.class);
@@ -67,12 +73,15 @@ public class UserDAOImplementation implements UserDAO {
 			User bean = query.getSingleResult();
 			transaction.commit();
 			return bean;
-
+		} catch (LMSException e) {
+			transaction.rollback();
+			throw new LMSException("User Not Found");
+		} catch (NoResultException e) {
+			transaction.rollback();
+			throw new LMSException("Invalid UserName or Password");
 		} catch (Exception e) {
-
-			System.err.println(e.getMessage());
-			return null;
-
+			transaction.rollback();
+			throw new LMSException("Error Occured While Commiting the Transction");
 		} finally {
 			manager.close();
 		}
@@ -84,7 +93,6 @@ public class UserDAOImplementation implements UserDAO {
 		EntityTransaction transaction = null;
 
 		try {
-
 			manager = factory.createEntityManager();
 			transaction = manager.getTransaction();
 			transaction.begin();
@@ -94,9 +102,18 @@ public class UserDAOImplementation implements UserDAO {
 			List<BookDetails> recordList = query.getResultList();
 			transaction.commit();
 			return recordList;
+		} catch (LMSException e) {
+			transaction.rollback();
+			throw new LMSException("No Book Found");
+		} catch (NoResultException e) {
+			transaction.rollback();
+			throw new LMSException("Books Not Found!! Please Try Again");
+		}catch (NullPointerException e) {
+			transaction.rollback();
+			throw new LMSException("User Not Found");
 		} catch (Exception e) {
-			System.err.println(e.getMessage());
-			return null;
+			transaction.rollback();
+			throw new LMSException("Error Occured While Commiting the Transction");
 		} finally {
 			manager.close();
 		}
@@ -116,9 +133,18 @@ public class UserDAOImplementation implements UserDAO {
 			List<BookDetails> recordList = query.getResultList();
 			transaction.commit();
 			return recordList;
+		} catch (LMSException e) {
+			transaction.rollback();
+			throw new LMSException("No Book Found");
+		} catch (NoResultException e) {
+			transaction.rollback();
+			throw new LMSException("Books Not Found!! Please Try Again");
+		}catch (NullPointerException e) {
+			transaction.rollback();
+			throw new LMSException("User Not Found");
 		} catch (Exception e) {
-			System.err.println(e.getMessage());
-			return null;
+			transaction.rollback();
+			throw new LMSException("Error Occured While Commiting the Transction");
 		} finally {
 			manager.close();
 		}
@@ -138,9 +164,18 @@ public class UserDAOImplementation implements UserDAO {
 			List<BookDetails> recordList = query.getResultList();
 			transaction.commit();
 			return recordList;
-		} catch (Exception e) {
-			System.err.println(e.getMessage());
-			return null;
+		} catch (LMSException e) {
+			transaction.rollback();
+			throw new LMSException("No Book Found");
+		} catch (NoResultException e) {
+			transaction.rollback();
+			throw new LMSException("Books Not Found!! Please Try Again");
+		}catch (NullPointerException e) {
+			transaction.rollback();
+			throw new LMSException("Book Not Found");
+		}catch (Exception e) {
+			transaction.rollback();
+			throw new LMSException("Error Occured While Commiting the Transction");
 		} finally {
 			manager.close();
 		}
@@ -151,6 +186,7 @@ public class UserDAOImplementation implements UserDAO {
 		EntityManager manager = null;
 		EntityTransaction transaction = null;
 		List<BookDetails> recordList = null;
+
 		try {
 			manager = factory.createEntityManager();
 			transaction = manager.getTransaction();
@@ -160,11 +196,18 @@ public class UserDAOImplementation implements UserDAO {
 			recordList = query.getResultList();
 			transaction.commit();
 			return recordList;
-
-		} catch (Exception e) {
-			System.err.println(e.getMessage());
+		} catch (LMSException e) {
 			transaction.rollback();
-			return recordList;
+			throw new LMSException("No Book Found");
+		} catch (NoResultException e) {
+			transaction.rollback();
+			throw new LMSException("Books Not Found!! Please Try Again");
+		}catch (NullPointerException e) {
+			transaction.rollback();
+			throw new LMSException("Book Not Found");
+		}catch (Exception e) {
+			transaction.rollback();
+			throw new LMSException("Error Occured While Commiting the Transction");
 		} finally {
 			manager.close();
 		}
@@ -177,7 +220,6 @@ public class UserDAOImplementation implements UserDAO {
 		EntityTransaction transaction = null;
 
 		try {
-
 			manager = factory.createEntityManager();
 			transaction = manager.getTransaction();
 			String jpql = "select u from User u where u.id=:id and u.role=:role and u.password=:password";
@@ -196,10 +238,18 @@ public class UserDAOImplementation implements UserDAO {
 			} else {
 				throw new LMSException("User doesnt exist");
 			}
-		} catch (Exception e) {
-			System.err.println(e.getMessage());
+		} catch (LMSException e) {
 			transaction.rollback();
-			return false;
+			throw new LMSException("Book Not Found");
+		} catch (NoResultException e) {
+			transaction.rollback();
+			throw new LMSException("Books Not Found!! Please Try Again");
+		} catch (NullPointerException e) {
+			transaction.rollback();
+			throw new LMSException("Book Not Found");
+		} catch (Exception e) {
+			transaction.rollback();
+			throw new LMSException("Error Occured While Commiting the Transction");
 		} finally {
 			manager.close();
 		}

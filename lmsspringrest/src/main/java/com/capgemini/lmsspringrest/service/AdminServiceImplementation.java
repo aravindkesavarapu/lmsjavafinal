@@ -37,18 +37,18 @@ public class AdminServiceImplementation implements AdminService{
 	}
 
 	@Override
-	public List<RequestDetails> showRequests() {
-		return dao.showRequests();
+	public List<RequestDetails> getAllRequestBooks() {
+		return dao.getAllRequestBooks();
 	}
 
 	@Override
-	public List<BookIssue> showIssuedBooks() {
-		return dao.showIssuedBooks();
+	public List<BookIssue> getAllIssuedBooks() {
+		return dao.getAllIssuedBooks();
 	}
 
 	@Override
-	public List<User> showUsers() {
-		return dao.showUsers();
+	public List<User> getAllUsersInfo() {
+		return dao.getAllUsersInfo();
 	}
 
 }

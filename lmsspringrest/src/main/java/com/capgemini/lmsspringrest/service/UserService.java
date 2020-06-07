@@ -7,7 +7,7 @@ import com.capgemini.lmsspringrest.dto.User;
 
 public interface UserService {
 
-	boolean registerUser(User user);
+	boolean addUser(User user);
 
 	User authUser(String email, String password);
 	

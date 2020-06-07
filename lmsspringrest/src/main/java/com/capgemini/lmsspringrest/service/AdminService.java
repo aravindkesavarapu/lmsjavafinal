@@ -18,9 +18,9 @@ public interface AdminService {
 
 	boolean bookIssue(int id, int bookId);
 	
-	List<RequestDetails> showRequests();
+	List<RequestDetails> getAllRequestBooks();
 
-	List<BookIssue> showIssuedBooks();
+	List<BookIssue> getAllIssuedBooks();
 	
-	 List<User> showUsers();
+	 List<User> getAllUsersInfo();
 }

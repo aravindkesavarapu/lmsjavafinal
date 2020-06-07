@@ -2,13 +2,12 @@ package com.capgemini.lmsspringrest.dao;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceUnit;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
@@ -24,79 +23,11 @@ import com.capgemini.lmsspringrest.exception.LMSException;
 
 @Repository
 public class StudentDAOImplementation implements StudentDAO {
+
 	@PersistenceUnit
 	EntityManagerFactory factory;
 
 	EntityManager manager = null;
-
-	@Override
-	public boolean request(int bookId, int id) {
-		EntityTransaction transaction = null;
-		manager = factory.createEntityManager();
-		int noOfBooks = 0;
-		List<BooksBorrowed> rsBookBorrowed = null;
-		try {
-			transaction = manager.getTransaction();
-			String jpqlBookDetails = "select b from BookDetails b where b.bookId=:bookId";
-			TypedQuery<BookDetails> query = manager.createQuery(jpqlBookDetails, BookDetails.class);
-			query.setParameter("bookId", bookId);
-			List<BookDetails> resultSetBookDetails = query.getResultList();
-			if (resultSetBookDetails != null) {
-				String jpqlRequest = "select r from RequestDetails r where r.uId=:uId and r.bookId=:bookId";
-				TypedQuery<RequestDetails> queryRequest = (TypedQuery<RequestDetails>) manager.createQuery(jpqlRequest,
-						RequestDetails.class);
-				queryRequest.setParameter("uId", id);
-				queryRequest.setParameter("bookId", bookId);
-				List<RequestDetails> listReq = queryRequest.getResultList();
-				if (listReq.size() < 1) {
-
-					String jpqlBookBorrwed = "select b from BooksBorrowed b where b.uId=:uId and b.bookId=:bookId";
-					TypedQuery<BooksBorrowed> queryBookBorrowed = (TypedQuery<BooksBorrowed>) manager
-							.createQuery(jpqlBookBorrwed, BooksBorrowed.class);
-					queryBookBorrowed.setParameter("uId", id);
-					queryBookBorrowed.setParameter("bookId", bookId);
-					rsBookBorrowed = queryBookBorrowed.getResultList();
-					if (rsBookBorrowed.isEmpty() || rsBookBorrowed == null) {
-						String jpqlBookIssue = "select b from BookIssue b where b.uId=:uId";
-						TypedQuery<BookIssue> query2 = (TypedQuery<BookIssue>) manager.createQuery(jpqlBookIssue,
-								BookIssue.class);
-						query2.setParameter("uId", id);
-						List<BookIssue> rsBookIssue = query2.getResultList();
-						noOfBooks = rsBookIssue.size();
-						if (noOfBooks <= 3) {
-							BookDetails book = manager.find(BookDetails.class, bookId);
-							User userEmail = manager.find(User.class, id);
-							transaction.begin();
-							RequestDetails rsRequestDetails = new RequestDetails();
-							rsRequestDetails.setBookId(bookId);
-							rsRequestDetails.setEmail(userEmail.getEmail());
-							rsRequestDetails.setBookName(book.getBookName());
-							rsRequestDetails.setUId(id);
-							manager.persist(rsRequestDetails);
-							transaction.commit();
-							return true;
-						} else {
-							throw new LMSException("You have crossed the book limit");
-						}
-					} else {
-						throw new LMSException("You have already borrowed the requested book");
-					}
-				} else {
-					throw new LMSException("You Are Requesting the Same bok");
-				}
-			} else {
-				throw new LMSException("The book with requested id is not present");
-			}
-
-		} catch (Exception e) {
-			System.err.println(e.getMessage());
-			transaction.rollback();
-			return false;
-		} finally {
-			manager.close();
-		}
-
-	}
 
 	@Override
 	public boolean returnBook(int bId, int uId) {
@@ -142,73 +73,134 @@ public class StudentDAOImplementation implements StudentDAO {
 
 					}
 				} else {
-//					transaction.begin();
-//					manager.remove(rs1);
-//					transaction.commit();
-//
-//					transaction.begin();
-//					String jpql3 = "select b from BooksBorrowed b  where b.bookId=:bookId and b.uId=:uId";
-//					Query query3 = manager.createQuery(jpql3);
-//					query3.setParameter("bookId", bId);
-//					query3.setParameter("uId", uId);
-//					BooksBorrowed bookRes = (BooksBorrowed) query3.getSingleResult();
-//					manager.remove(bookRes);
-//					transaction.commit();
-//
-//					return true;
-					System.err.println("Respective Bookk Not Issued");
-					return false;
+					transaction.rollback();
+					throw new LMSException("Respective Book Not Issued to User");
 				}
 
 			} else {
-				System.err.println("Book doesnt exist in the library");
-				return false;
+				transaction.rollback();
+				throw new LMSException("Book doesnt exist in the library");
 			}
-
+		} catch (LMSException e) {
+			transaction.rollback();
+			throw new LMSException(e.getMessage());
+		} catch (NoResultException e) {
+			transaction.rollback();
+			throw new LMSException("Book Not Returned to Library!! Please Try Again");
+		} catch (NullPointerException e) {
+			transaction.rollback();
+			throw new LMSException("Book Not Returned to Library!! Please Try Again");
 		} catch (Exception e) {
-			System.err.println(e.getMessage());
-			return false;
+			transaction.rollback();
+			throw new LMSException("Error Occured While Commiting the Transction");
+		} finally {
+			manager.close();
 		}
 	}
 
 	@Override
-	public LinkedList<Integer> bookHistoryDetails(int id) {
-//		int count = 0;
-//		List<BookIssue> recordList = null;
-//		LinkedList<Integer> list = null;
-//		try {
-//			manager = factory.createEntityManager();
-//			String jpql = "select b from BookIssue b";
-//			TypedQuery<BookIssue> query = manager.createQuery(jpql, BookIssue.class);
-//			recordList = query.getResultList();
-//			for (BookIssue bookInfo : recordList) {
-//				noOfBooks = count++;
+	public boolean request(int bookId, int id) {
+		EntityTransaction transaction = null;
+		int noOfBooks = 0;
+		List<BooksBorrowed> rsBookBorrowed = null;
+		try {
+			manager = factory.createEntityManager();
+			transaction = manager.getTransaction();
+			String jpqlBookDetails = "select b from BookDetails b where b.bookId=:bookId";
+			TypedQuery<BookDetails> query = manager.createQuery(jpqlBookDetails, BookDetails.class);
+			query.setParameter("bookId", bookId);
+			List<BookDetails> resultSetBookDetails = query.getResultList();
+			if (resultSetBookDetails != null) {
+				String jpqlRequest = "select r from RequestDetails r where r.uId=:uId and r.bookId=:bookId";
+				TypedQuery<RequestDetails> queryRequest = (TypedQuery<RequestDetails>) manager.createQuery(jpqlRequest,
+						RequestDetails.class);
+				queryRequest.setParameter("uId", id);
+				queryRequest.setParameter("bookId", bookId);
+				List<RequestDetails> listReq = queryRequest.getResultList();
+				if (listReq.size() < 1) {
+
+					String jpqlBookBorrwed = "select b from BooksBorrowed b where b.uId=:uId and b.bookId=:bookId";
+					TypedQuery<BooksBorrowed> queryBookBorrowed = (TypedQuery<BooksBorrowed>) manager
+							.createQuery(jpqlBookBorrwed, BooksBorrowed.class);
+					queryBookBorrowed.setParameter("uId", id);
+					queryBookBorrowed.setParameter("bookId", bookId);
+					rsBookBorrowed = queryBookBorrowed.getResultList();
+//					int noOfBorrowedBooks = rsBookBorrowed.size();
+					if (rsBookBorrowed.isEmpty() || rsBookBorrowed == null) {
+						String jpqlBookIssue = "select b from BookIssue b where b.uId=:uId";
+						TypedQuery<BookIssue> query2 = (TypedQuery<BookIssue>) manager.createQuery(jpqlBookIssue,
+								BookIssue.class);
+						query2.setParameter("uId", id);
+						List<BookIssue> rsBookIssue = query2.getResultList();
+						noOfBooks = rsBookIssue.size();
+						if (noOfBooks <= 3) {
+							BookDetails book = manager.find(BookDetails.class, bookId);
+							User userEmail = manager.find(User.class, id);
+							transaction.begin();
+							RequestDetails rsRequestDetails = new RequestDetails();
+							rsRequestDetails.setBookId(bookId);
+							rsRequestDetails.setEmail(userEmail.getEmail());
+							rsRequestDetails.setBookName(book.getBookName());
+							rsRequestDetails.setUId(id);
+							manager.persist(rsRequestDetails);
+							transaction.commit();
+							return true;
+						} else {
+							transaction.rollback();
+							throw new LMSException("You have crossed the book limit");
+						}
+					} else {
+						transaction.rollback();
+						throw new LMSException("You have already borrowed the requested book");
+					}
+				} else {
+					transaction.rollback();
+					throw new LMSException("You Are Requesting the Same book!!");
+				}
+			} else {
+				transaction.rollback();
+				throw new LMSException("Requested Book Id Not Found");
+			}
+//			else {
+//				throw new LMSException("The book with requested id is not present");
 //			}
-//			list = new LinkedList<Integer>();
-//			list.add(noOfBooks);
-//		} catch (Exception e) {
-//			return null;
-//		} finally {
-//			manager.close();
-//		}
-//		return list;
-		return null;
+		} catch (LMSException e) {
+			transaction.rollback();
+			throw new LMSException(e.getMessage());
+		} catch (NoResultException e) {
+			transaction.rollback();
+			throw new LMSException("Book Not Requested!! Please Try Again");
+		} catch (NullPointerException e) {
+			transaction.rollback();
+			throw new LMSException("Book Not Requested!! Please Try Again");
+		} catch (Exception e) {
+			System.err.println(e.getMessage());
+			transaction.rollback();
+			throw new LMSException("Error Occured While Commiting the Transction");
+		} finally {
+			manager.close();
+		}
+
 	}
 
 	@Override
-	public List<BooksBorrowed> borrowedBook(int id) {
+	public List<BooksBorrowed> getBorrowedBooks(int uid) {
 
 		try {
-			factory = Persistence.createEntityManagerFactory("TestPersistence");
 			manager = factory.createEntityManager();
 			String jpql = "select b from BooksBorrowed b where b.uId=:uId";
 			TypedQuery<BooksBorrowed> query = manager.createQuery(jpql, BooksBorrowed.class);
-			query.setParameter("uId", id);
+			query.setParameter("uId", uid);
 			List<BooksBorrowed> recordList = query.getResultList();
 			return recordList;
+		} catch (LMSException e) {
+			throw new LMSException(e.getMessage());
+		} catch (NoResultException e) {
+			throw new LMSException("Till Now, No Books are Borrowed By the User!! Please Try Again");
+		} catch (NullPointerException e) {
+			throw new LMSException("Till Now, No Books are Borrowed By the User!! Please Try Again");
 		} catch (Exception e) {
-			System.err.println(e.getMessage());
-			return null;
+			throw new LMSException("Error Occured While Commiting the Transction");
 		} finally {
 			manager.close();
 		}

@@ -28,25 +28,27 @@ import com.capgemini.lmsspringrest.service.UserService;
 public class LibraryRestContoller {
 
 	@Autowired
-	private StudentService studentService;
-	@Autowired
 	private AdminService adminService;
+	@Autowired
+	private StudentService studentService;
 	@Autowired
 	private UserService userService;
 
-	@PostMapping(path = "/addUser", consumes = { MediaType.APPLICATION_JSON_VALUE,
+	//Admin
+	@PutMapping(path = "/updateBook", consumes = { MediaType.APPLICATION_JSON_VALUE,
 			MediaType.APPLICATION_XML_VALUE }, produces = { MediaType.APPLICATION_JSON_VALUE,
 					MediaType.APPLICATION_XML_VALUE })
-	public LibraryResponse addUser(@RequestBody User bean) {
-		boolean isAdded = userService.registerUser(bean);
+	public LibraryResponse updateBook(@RequestBody BookDetails bean) {
+		boolean isBookUpdated = adminService.updateBook(bean);
 		LibraryResponse response = new LibraryResponse();
-		if (isAdded) {
-			response.setMessage("record inserted");
+		if (isBookUpdated) {
+			response.setMessage("Book updated succesfully");
 		} else {
 			response.setError(true);
-			response.setMessage("unable to add");
+			response.setMessage("Book cannot be updated");
 		}
 		return response;
+
 	}
 
 	@PostMapping(path = "/addBook", consumes = { MediaType.APPLICATION_JSON_VALUE,
@@ -65,34 +67,64 @@ public class LibraryRestContoller {
 
 	}
 
-	@PutMapping(path = "/updateBook", consumes = { MediaType.APPLICATION_JSON_VALUE,
+	@PostMapping(path = "/bookIssue", consumes = { MediaType.APPLICATION_JSON_VALUE,
 			MediaType.APPLICATION_XML_VALUE }, produces = { MediaType.APPLICATION_JSON_VALUE,
 					MediaType.APPLICATION_XML_VALUE })
-	public LibraryResponse updateBook(@RequestBody BookDetails bean) {
-		boolean isBookUpdated = adminService.updateBook(bean);
+	public LibraryResponse issueBook(@RequestBody BookIssue bookIssue) {
+		System.out.println(bookIssue.getBookId() + " " + bookIssue.getId());
+
+		boolean isBookIssued = adminService.bookIssue(bookIssue.getId(), bookIssue.getBookId());
 		LibraryResponse response = new LibraryResponse();
-		if (isBookUpdated) {
-			response.setMessage("Book updated succesfully");
+		if (isBookIssued) {
+			response.setMessage("Book issued succesfully");
 		} else {
 			response.setError(true);
-			response.setMessage("Book cannot be updated");
+			response.setMessage("Book cannot be issued");
 		}
 		return response;
 
 	}
 
-	@PostMapping(path = "/login", consumes = { MediaType.APPLICATION_JSON_VALUE,
-			MediaType.APPLICATION_XML_VALUE }, produces = { MediaType.APPLICATION_JSON_VALUE,
-					MediaType.APPLICATION_XML_VALUE })
-	public LibraryResponse authentication(@RequestBody User userInfo) {
-		User userLogin = userService.authUser(userInfo.getEmail(), userInfo.getPassword());
+	@GetMapping(path = "/showRequests", produces = { MediaType.APPLICATION_JSON_VALUE,
+			MediaType.APPLICATION_XML_VALUE })
+	public LibraryResponse showRequests() {
+		List<RequestDetails> detailList = adminService.getAllRequestBooks();
 		LibraryResponse response = new LibraryResponse();
-		if (userLogin != null) {
-			response.setUser(userLogin);
-			response.setMessage("Login succesfully");
+
+		if (detailList != null && !detailList.isEmpty()) {
+			response.setDetails(detailList);
 		} else {
 			response.setError(true);
-			response.setMessage("Invalid credentials,Please try again");
+			response.setMessage("They are no requests");
+		}
+		return response;
+	}
+
+	@GetMapping(path = "/showIssuedBooks", produces = { MediaType.APPLICATION_JSON_VALUE,
+			MediaType.APPLICATION_XML_VALUE })
+	public LibraryResponse showIssuedBooks() {
+		List<BookIssue> issueList = adminService.getAllIssuedBooks();
+		LibraryResponse response = new LibraryResponse();
+
+		if (issueList != null && !issueList.isEmpty()) {
+			response.setIssue(issueList);
+		} else {
+			response.setError(true);
+			response.setMessage("No Books are Issued");
+		}
+		return response;
+	}
+
+	@GetMapping(path = "/showUsers", produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
+	public LibraryResponse showUsers() {
+		List<User> usersList = adminService.getAllUsersInfo();
+		LibraryResponse response = new LibraryResponse();
+
+		if (usersList != null && !usersList.isEmpty()) {
+			response.setUsers(usersList);
+		} else {
+			response.setError(true);
+			response.setMessage("They are no Users");
 		}
 		return response;
 	}
@@ -107,6 +139,52 @@ public class LibraryRestContoller {
 		} else {
 			response.setError(true);
 			response.setMessage("Book not deleted");
+		}
+		return response;
+	}
+
+	// User Service
+	@PostMapping(path = "/addUser", consumes = { MediaType.APPLICATION_JSON_VALUE,
+			MediaType.APPLICATION_XML_VALUE }, produces = { MediaType.APPLICATION_JSON_VALUE,
+					MediaType.APPLICATION_XML_VALUE })
+	public LibraryResponse addUser(@RequestBody User bean) {
+		boolean isAdded = userService.addUser(bean);
+		LibraryResponse response = new LibraryResponse();
+		if (isAdded) {
+			response.setMessage("User Registered Successfully");
+		} else {
+			response.setError(true);
+			response.setMessage("User Not Registered");
+		}
+		return response;
+	}
+
+	@PutMapping(path = "/updatePassword", produces = { MediaType.APPLICATION_JSON_VALUE,
+			MediaType.APPLICATION_XML_VALUE }, consumes = { MediaType.APPLICATION_JSON_VALUE,
+					MediaType.APPLICATION_XML_VALUE })
+	public LibraryResponse updatePassord(@RequestBody User userInfo) {
+		boolean isUpdated = userService.updatePassword(userInfo.getId(), userInfo.getPassword(), userInfo.getPassword(),
+				userInfo.getRole());
+		LibraryResponse response = new LibraryResponse();
+
+		if (isUpdated) {
+			response.setMessage("Password updated successfully");
+		} else {
+			response.setError(true);
+			response.setMessage("Password is not updated");
+		}
+		return response;
+	}
+
+	@PostMapping(path = "/login", consumes = { MediaType.APPLICATION_JSON_VALUE,
+			MediaType.APPLICATION_XML_VALUE }, produces = { MediaType.APPLICATION_JSON_VALUE,
+					MediaType.APPLICATION_XML_VALUE })
+	public LibraryResponse authentication(@RequestBody User userInfo) {
+		User userLogin = userService.authUser(userInfo.getEmail(), userInfo.getPassword());
+		LibraryResponse response = new LibraryResponse();
+		if (userLogin != null) {
+			response.setUser(userLogin);
+			response.setMessage("Login succesfully");
 		}
 		return response;
 	}
@@ -170,24 +248,7 @@ public class LibraryRestContoller {
 		return response;
 	}
 
-	@PostMapping(path = "/bookIssue", consumes = { MediaType.APPLICATION_JSON_VALUE,
-			MediaType.APPLICATION_XML_VALUE }, produces = { MediaType.APPLICATION_JSON_VALUE,
-					MediaType.APPLICATION_XML_VALUE })
-	public LibraryResponse issueBook(@RequestBody BookIssue bookIssue) {
-		System.out.println(bookIssue.getBookId() + " " + bookIssue.getId());
-
-		boolean isBookIssued = adminService.bookIssue(bookIssue.getId(), bookIssue.getBookId());
-		LibraryResponse response = new LibraryResponse();
-		if (isBookIssued) {
-			response.setMessage("Book issued succesfully");
-		} else {
-			response.setError(true);
-			response.setMessage("Book cannot be issued");
-		}
-		return response;
-
-	}
-
+	// Student Service
 	@PostMapping(path = "/returnBook", consumes = { MediaType.APPLICATION_JSON_VALUE,
 			MediaType.APPLICATION_XML_VALUE }, produces = { MediaType.APPLICATION_JSON_VALUE,
 					MediaType.APPLICATION_XML_VALUE })
@@ -218,71 +279,10 @@ public class LibraryRestContoller {
 		return response;
 	}
 
-	@GetMapping(path = "/showRequests", produces = { MediaType.APPLICATION_JSON_VALUE,
-			MediaType.APPLICATION_XML_VALUE })
-	public LibraryResponse showRequests() {
-		List<RequestDetails> detailList = adminService.showRequests();
-		LibraryResponse response = new LibraryResponse();
-
-		if (detailList != null && !detailList.isEmpty()) {
-			response.setDetails(detailList);
-		} else {
-			response.setError(true);
-			response.setMessage("They are no requests");
-		}
-		return response;
-	}
-
-	@GetMapping(path = "/showIssuedBooks", produces = { MediaType.APPLICATION_JSON_VALUE,
-			MediaType.APPLICATION_XML_VALUE })
-	public LibraryResponse showIssuedBooks() {
-		List<BookIssue> issueList = adminService.showIssuedBooks();
-		LibraryResponse response = new LibraryResponse();
-
-		if (issueList != null && !issueList.isEmpty()) {
-			response.setIssue(issueList);
-		} else {
-			response.setError(true);
-			response.setMessage("No Books are Issued");
-		}
-		return response;
-	}
-
-	@GetMapping(path = "/showUsers", produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
-	public LibraryResponse showUsers() {
-		List<User> usersList = adminService.showUsers();
-		LibraryResponse response = new LibraryResponse();
-
-		if (usersList != null && !usersList.isEmpty()) {
-			response.setUsers(usersList);
-		} else {
-			response.setError(true);
-			response.setMessage("They are no Users");
-		}
-		return response;
-	}
-
-	@PutMapping(path = "/updatePassword", produces = { MediaType.APPLICATION_JSON_VALUE,
-			MediaType.APPLICATION_XML_VALUE }, consumes = { MediaType.APPLICATION_JSON_VALUE,
-					MediaType.APPLICATION_XML_VALUE })
-	public LibraryResponse updatePassord(@RequestBody User userInfo) {
-		boolean isUpdated = userService.updatePassword(userInfo.getId(), userInfo.getPassword(), userInfo.getPassword(),
-				userInfo.getRole());
-		LibraryResponse response = new LibraryResponse();
-
-		if (isUpdated) {
-			response.setMessage("Password updated successfully");
-		} else {
-			response.setError(true);
-			response.setMessage("Password is not updated");
-		}
-		return response;
-	}
-
 	@PostMapping(path = "/borrowedBooks", produces = { MediaType.APPLICATION_JSON_VALUE,
 			MediaType.APPLICATION_XML_VALUE })
 	public LibraryResponse getBorrowedBooks(@RequestBody BooksBorrowed borrowedBooks) {
-		List<BooksBorrowed> borrowed = studentService.borrowedBook(borrowedBooks.getId());
+		List<BooksBorrowed> borrowed = studentService.getBorrowedBooks(borrowedBooks.getId());
 		LibraryResponse response = new LibraryResponse();
 
 		if (borrowed != null && !borrowed.isEmpty()) {

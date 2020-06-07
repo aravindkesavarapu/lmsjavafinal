@@ -12,6 +12,7 @@ import com.capgemini.lmshibernate.dto.UserPrimaryInfo;
 import com.capgemini.lmshibernate.exception.LMSException;
 
 public class UserDAOImplementation implements UserDAO {
+	
 	EntityManagerFactory factory = Persistence.createEntityManagerFactory("TestPersistence");
 
 	@Override
@@ -21,7 +22,6 @@ public class UserDAOImplementation implements UserDAO {
 		EntityTransaction transaction = manager.getTransaction();
 		boolean flag = false;
 		try {
-
 			String jpqlQuery = "from UserPrimaryInfo user ";
 			TypedQuery<UserPrimaryInfo> query = manager.createQuery(jpqlQuery, UserPrimaryInfo.class);
 			List<UserPrimaryInfo> list = query.getResultList();

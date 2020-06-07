@@ -26,7 +26,7 @@ public class StudentServiceTest {
 	}
 	@Test
 	public void testBorrowedBook() {
-		List<BooksBorrowed> info = service.borrowedBook(54321);
+		List<BooksBorrowed> info = service.getBorrowedBooks(54321);
 		Assertions.assertNotNull(info);
 	}
 	@Test
@@ -41,7 +41,7 @@ public class StudentServiceTest {
 	}
 	@Test
 	public void testBorrowedBook1() {
-		List<BooksBorrowed> result = service.borrowedBook(54321);
+		List<BooksBorrowed> result = service.getBorrowedBooks(54321);
 		Assertions.assertNotNull(result);
 	}
 }

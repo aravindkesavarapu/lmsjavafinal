@@ -30,6 +30,10 @@ public class BookIssue implements Serializable {
 	@Column
 	private int bookId;
 	@Column
+	private String bookName;
+	@Column
+	private String userMailId;
+	@Column
 	@Temporal(TemporalType.DATE)
 	@JsonFormat(pattern = "yyyy-MM-dd",shape = JsonFormat.Shape.STRING)
 	private Date issueDate;

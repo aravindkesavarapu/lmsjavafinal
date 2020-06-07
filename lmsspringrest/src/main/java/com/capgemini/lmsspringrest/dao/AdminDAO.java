@@ -11,15 +11,15 @@ public interface AdminDAO {
 
 	boolean addBook(BookDetails bookInfo);
 
-	boolean removeBook(int bookId);	
+	boolean bookIssue(int uId, int bookId);
 
 	boolean updateBook(BookDetails bookInfo);
 
-	boolean bookIssue(int uId, int bookId);
+	boolean removeBook(int bookId);
 
-	List<RequestDetails> showRequests();
+	List<RequestDetails> getAllRequestBooks();
 
-	List<BookIssue> showIssuedBooks();
+	List<BookIssue> getAllIssuedBooks();
 
-	List<User> showUsers();
+	List<User> getAllUsersInfo();
 }

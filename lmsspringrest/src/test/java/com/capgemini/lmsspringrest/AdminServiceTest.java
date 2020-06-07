@@ -102,38 +102,38 @@ public class AdminServiceTest {
 	@Test
 	public void testShowRequest() {
 		
-		List<RequestDetails> result = service.showRequests();
+		List<RequestDetails> result = service.getAllRequestBooks();
 		Assertions.assertNotNull(result);
 	}
 	
 	@Test
 	public void testShowRequests() {
-		List<RequestDetails> result = service.showRequests();
+		List<RequestDetails> result = service.getAllRequestBooks();
 		Assertions.assertEquals(1, result.size());
 		
 	}
 	
 	@Test
 	public void testShowUser() {
-		List<User> result = service.showUsers();
+		List<User> result = service. getAllUsersInfo();
 		Assertions.assertNotNull(result);
 	}
 	
 	@Test
 	public void testShowUsers() {
-		List<User> result = service.showUsers();
+		List<User> result = service.getAllUsersInfo();
 		Assertions.assertEquals(1, result.size());
 	}
 	
 	@Test
 	public void testShowIssuedBook() {
-		List<BookIssue> result = service.showIssuedBooks();
+		List<BookIssue> result = service.getAllIssuedBooks();
 		Assertions.assertNotNull(result);
 	}
 	
 	@Test
 	public void testShowIssuedBooks() {
-		List<BookIssue> result = service.showIssuedBooks();
+		List<BookIssue> result = service.getAllIssuedBooks();
 		Assertions.assertEquals(1, result.size());
 		
 	}

@@ -101,38 +101,38 @@ public class AdminDAOTest {
 	@Test
 	public void testShowRequest() {
 
-		List<RequestDetails> result = dao.showRequests();
+		List<RequestDetails> result = dao.getAllRequestBooks();
 		Assertions.assertNotNull(result);
 	}
 
 	@Test
 	public void testShowRequests() {
-		List<RequestDetails> result = dao.showRequests();
+		List<RequestDetails> result = dao.getAllRequestBooks();
 		Assertions.assertEquals(1, result.size());
 
 	}
 
 	@Test
 	public void testShowUser() {
-		List<User> result = dao.showUsers();
+		List<User> result = dao.getAllUsersInfo();
 		Assertions.assertNotNull(result);
 	}
 
 	@Test
 	public void testShowUsers() {
-		List<User> result = dao.showUsers();
+		List<User> result = dao.getAllUsersInfo();
 		Assertions.assertEquals(1, result.size());
 	}
 
 	@Test
 	public void testShowIssuedBook() {
-		List<BookIssue> result = dao.showIssuedBooks();
+		List<BookIssue> result = dao.getAllIssuedBooks();
 		Assertions.assertNotNull(result);
 	}
 
 	@Test
 	public void testShowIssuedBooks() {
-		List<BookIssue> result = dao.showIssuedBooks();
+		List<BookIssue> result = dao.getAllIssuedBooks();
 		Assertions.assertEquals(1, result.size());
 
 	}

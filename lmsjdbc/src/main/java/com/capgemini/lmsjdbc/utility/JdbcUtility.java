@@ -17,7 +17,6 @@ public class JdbcUtility {
 	public static Connection getConnection() {
 		try {
 			FileInputStream inputStream = new FileInputStream("db.properties");
-
 			Properties properties = new Properties();
 			properties.load(inputStream);
 
@@ -27,7 +26,7 @@ public class JdbcUtility {
 			Class.forName(driver);
 			connection = DriverManager.getConnection(dburl);
 
-			return connection;
+//			return connection;
 
 		} catch (FileNotFoundException e) {
 			throw new LMSException("File Not Exists");

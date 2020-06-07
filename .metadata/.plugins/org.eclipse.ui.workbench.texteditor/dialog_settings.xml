@@ -1,39 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="userDao"/>
+		<item key="selection" value="null"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="true"/>
-		<item key="wholeword" value="true"/>
+		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
-		<item key="isRegEx" value="true"/>
+		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
-			<item value="dao"/>
-			<item value="userDao"/>
-			<item value="Implements"/>
-			<item value="uId"/>
-			<item value="vandana"/>
-			<item value="toString"/>
-			<item value="list"/>
-			<item value="sort("/>
-			<item value="public static"/>
-			<item value="sort"/>
-			<item value="unique"/>
-			<item value="return"/>
-			<item value="yyyy-MM-dd"/>
-			<item value="bookHis"/>
+			<item value="package com.capgemini.lmsspringrest.dao;"/>
+			<item value="nullpoin"/>
+			<item value="null"/>
+			<item value="Admin"/>
+			<item value="admin_enters_"/>
+			<item value="admin_enters"/>
+			<item value="student_"/>
+			<item value="Student"/>
+			<item value="package com.capgemini.lmsspringrest.stepdefinitions;"/>
+			<item value="user"/>
+			<item value="User"/>
+			<item value="user_"/>
+			<item value="&quot;^user"/>
+			<item value="&quot;^User"/>
+			<item value="&#x09;@PersistenceUnit"/>
 		</list>
 		<list key="replacehistory">
-			<item value="userDao"/>
-			<item value="studentDao"/>
-			<item value="Implementation"/>
-			<item value="UId"/>
+			<item value="User"/>
+			<item value="admin_"/>
+			<item value="Admin"/>
+			<item value="student"/>
+			<item value="student_"/>
+			<item value="&quot;^student"/>
+			<item value="&quot;^Student"/>
+			<item value="Student"/>
+			<item value="set.setUp();"/>
+			<item value="set."/>
+			<item value="set"/>
+			<item value="&#x09;&#x09;&#x09;EntityManagerFactory factory = SetUp.setUp();"/>
+			<item value="kesavarapu"/>
 			<item value="aravind"/>
+			<item value="studentDao"/>
 		</list>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
-		<item key="DIALOG_X_ORIGIN" value="470"/>
-		<item key="DIALOG_Y_ORIGIN" value="198"/>
+		<item key="DIALOG_X_ORIGIN" value="1065"/>
+		<item key="DIALOG_Y_ORIGIN" value="209"/>
 		<item key="DIALOG_WIDTH" value="284"/>
 		<item key="DIALOG_HEIGHT" value="391"/>
 		<item key="DIALOG_FONT_NAME" value="1|Segoe UI|9.0|0|WINDOWS|1|-12|0|0|0|400|0|0|0|1|0|0|0|0|Segoe UI"/>
